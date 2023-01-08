@@ -2,13 +2,14 @@
   "name": "backend_projekt_dt162g",
   "version": "1.0.0",
   "description": "Backend (Api med NodeJS+Express) för projekt i kurs DT162G",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Marcus Andersson",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "moongoose": "^0.0.1"
   }
