@@ -10,7 +10,6 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 //Importera Routes
-let usersRouter = require("./routes/users");
 let todoListRouter = require("./routes/todoList");
 
 //Ifall användare besöker ./ så möts de av ett statusmeddelande i JSON-format
@@ -19,7 +18,6 @@ app.get("/", (req, res, next) => {
 });
 
 //Knyt URI till router
-app.use("/users", usersRouter);
 app.use("/todoList", todoListRouter);
 
 
