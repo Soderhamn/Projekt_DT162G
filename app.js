@@ -1,4 +1,4 @@
-/* REST-api i NodeJS + Express
+/* REST-api i NodeJS + Express, till Moment 5 - Projekt i kurs DT162G
 Av: Marcus Andersson, maan2117@student.miun.se */
 
 //Grundläggande imports och inställningar
