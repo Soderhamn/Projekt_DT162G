@@ -17,7 +17,7 @@ let todoSchema = mongoose.Schema({
 //Skapa Model
 let Todo = mongoose.model('Todo', todoSchema);
 
-/* Hämta (GET) todos */
+/* --------------------------------------------------Hämta (GET) todos --------------------------------------------------*/
 router.get('/', async function(req, res, next) {
   let todos = await Todo.find({}); //Hitta alla Todos
 
@@ -30,7 +30,7 @@ router.get('/', async function(req, res, next) {
   }
 });
 
-/* Hämta specifikt Todo */
+/* --------------------------------------------------Hämta specifikt Todo-------------------------------------------------- */
 router.get('/:id', async (req, res, next) => {
   let id = req.params.id; //Läs in det Id som skickats med som parameter
 
@@ -47,14 +47,7 @@ router.get('/:id', async (req, res, next) => {
   
 });
 
-/* Uppdatera Todo */
-router.put('/:id', async (req, res, next) => {
-  let id = req.params.id;//Läser in det Id som skickats med som parameter
-
-  res.send(`UPPDATERA Specifikt todo med id: ${id}`);
-});
-
-/* Skapa nytt Todo (Post) */
+/* --------------------------------------------------Skapa nytt Todo (Post)-------------------------------------------------- */
 router.post('/', async (req, res, next) => {
   const jsonData = req.body; //Läs in den Json-data som skickats med i Body i anropet
 
@@ -69,13 +62,54 @@ router.post('/', async (req, res, next) => {
   await todo.save().catch(err => console.log(err)); //Konsol-logga eventuella fel
 
   //Returnera meddelande att Todo skapats
+  res.status(201); //Http 201, created
   res.send({
     "status": "Todo skapad", 
     "Data som lagrats": todo 
   });
 });
 
-/* Radera Todo (Delete) */
+/* --------------------------------------------------Uppdatera Todo-------------------------------------------------- */
+router.put('/:id', async (req, res, next) => {
+  let id = req.params.id;//Läser in det Id som skickats med som parameter
+
+  let foundTodo = await Todo.findById(id); //Hitta en specifikt "Att göra" via dess Id
+
+  if(foundTodo === null) {  //Hittades inte
+    res.status(404);
+    res.send(`Kunde inte hitta todo med id ${id}`);
+  }
+  else { //Hittades
+    const jsonData = req.body; //Läs in den Json-data som skickats med i Body i anropet
+
+    //Skapa ny instans av modellen Todo, lägg in datat som skickats med..
+    let todo = new Todo({
+      todoTitle: jsonData.todoName,
+      todoDescription: jsonData.todoDesc,
+      todoIsDone: false
+    });
+  
+    //Uppdatera dokumentet
+    let result = await Todo.updateOne({_id: id}, { todoTitle: todo.todoTitle, todoDescription: todo.todoDescription, todoIsDone: todo.todoIsDone }).catch((err) => { console.log(err)});
+  
+    console.log("RESULTAT: " + JSON.stringify(result));
+
+    if(result.modifiedCount == 1) { //Ett (1) dokument har modifierats
+      res.status(200); //Lyckades
+      res.send(todo);
+    }
+    else if(result.modifiedCount == 0 && result.matchedCount == 1) {
+      res.status(400); //Error-kod (Internal server error)
+      res.send("Fel: Ingen data att uppdatera");
+    }
+    else {
+      res.status(500); //Error-kod (Internal server error)
+      res.send("Fel: kunde inte uppdatera");
+    }
+  }
+});
+
+/*--------------------------------------------------Radera Todo (Delete)-------------------------------------------------- */
 router.delete('/:id', async (req, res, next) => {
   let id = req.params.id; //Läs in id
 
@@ -90,8 +124,17 @@ router.delete('/:id', async (req, res, next) => {
       "text": `Todo med Id ${id} raderades!`
     });
   }
+});
 
+/* --------------------Hantera felaktig Delete-anrop och Update (snyggare felmedd. ifall saknar id-parameter)-------------------- */
+router.delete('/', async (req, res, next) => {
+  res.status(400);
+  res.send("Saknar parameter: :id");
+});
 
+router.put('/', async (req, res, next) => {
+  res.status(400);
+  res.send("Saknar parameter: :id");
 });
 
 
