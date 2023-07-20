@@ -55,7 +55,7 @@ router.post("/", async (req, res, next) => {
   let todo = new Todo({
     todoTitle: jsonData.todoName,
     todoDescription: jsonData.todoDesc,
-    todoIsDone: false,
+    todoIsDone: jsonData.todoIsDone,
   });
 
   //Spara ny Todo i Databasen
